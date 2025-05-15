@@ -4,12 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Nutrition System | Login & Register</title>
-  <link rel="stylesheet" href="./assets/css/style.css" />
+  <link rel="stylesheet" href="./css/style.css" />
 </head>
 <body>
   <div class="auth-wrapper">
     <div class="auth-container">
-      <h2 class="auth-title">Nutrition Recommender System</h2>
+      <h2 class="auth-title">Dating Site</h2>
 
       <?php
         session_start();
@@ -45,6 +45,26 @@
     </div>
   </div>
 
-  <script src="./assets/js/login.js"></script>
+  <script>
+    // login and register page swapping 
+    function showLogin(){
+      document.getElementById('register-form').style.display= 'none';
+      document.getElementById('login-form').style.display = 'block';
+    }
+
+    function showRegister(){
+      document.getElementById('login-form').style.display = 'none';
+      document.getElementById('register-form').style.display = 'block';
+    }
+
+    document.addEventListener("DOMContentLoaded", function(){
+      let activeForm = sessionStorage.getItem("activeForm") || "login";
+      if (activeForm === "register"){
+        showRegister();
+      } else {
+        showLogin();
+      }
+    });
+  </script>
 </body>
 </html>
