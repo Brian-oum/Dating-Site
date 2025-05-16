@@ -3,13 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Nutrition System | Login & Register</title>
+  <title>AfroLove | African Dating & Connections</title>
   <link rel="stylesheet" href="./css/style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
 </head>
 <body>
   <div class="auth-wrapper">
     <div class="auth-container">
-      <h2 class="auth-title">Dating Site</h2>
+      <h2 class="auth-title">Afro Love</h2>
 
       <?php
         session_start();
@@ -44,27 +45,33 @@
       </div>
     </div>
   </div>
-
   <script>
-    // login and register page swapping 
-    function showLogin(){
-      document.getElementById('register-form').style.display= 'none';
-      document.getElementById('login-form').style.display = 'block';
+    document.addEventListener("DOMContentLoaded", function () {
+    // Show Login Form
+    function showLogin() {
+        document.getElementById('register-form').style.display = 'none';
+        document.getElementById('login-form').style.display = 'block';
     }
 
-    function showRegister(){
-      document.getElementById('login-form').style.display = 'none';
-      document.getElementById('register-form').style.display = 'block';
+    // Show Register Form
+    function showRegister() {
+        document.getElementById('login-form').style.display = 'none';
+        document.getElementById('register-form').style.display = 'block';
     }
 
-    document.addEventListener("DOMContentLoaded", function(){
-      let activeForm = sessionStorage.getItem("activeForm") || "login";
-      if (activeForm === "register"){
-        showRegister();
-      } else {
-        showLogin();
-      }
-    });
+    // Prevent form resubmission on page refresh
+    if (window.history.replaceState) {
+        window.history.replaceState(null, null, window.location.href);
+    }
+
+    // Email Verification
+    const urlParams = new URLSearchParams(window.location.search);
+    const email = urlParams.get("email");
+    const userEmailInput = document.getElementById("userEmail");
+
+    if (userEmailInput) {
+        userEmailInput.value = email ? email : "";
+    }
   </script>
 </body>
 </html>

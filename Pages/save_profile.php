@@ -22,8 +22,7 @@ if ($photo) {
 $sql = "UPDATE users SET
     profile_photo = COALESCE(NULLIF(?, ''), profile_photo),
     first_name = ?, last_name = ?, show_last_name = ?,
-    age = ?, location = ?, gender = ?, orientation = ?,
-    interests = ?, bio = ?, relationship_goals = ?
+    age = ?, location = ?, gender = ?,  bio = ?
     WHERE id = ?";
 
 $stmt = $pdo->prepare($sql);
@@ -35,10 +34,7 @@ $stmt->execute([
     $_POST['age'] ?? 0,
     $_POST['location'] ?? '',
     $_POST['gender'] ?? '',
-    $_POST['orientation'] ?? '',
-    $_POST['interests'] ?? '',
     $_POST['bio'] ?? '',
-    $_POST['relationship_goals'] ?? '',
     $id
 ]);
 
