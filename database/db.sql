@@ -7,16 +7,14 @@ REATE TABLE account (
 );
 CREATE TABLE users (
     id INT AUTO_INCREMENT PRIMARY KEY,
+    account_id INT NOT NULL,
     profile_photo VARCHAR(255),
     first_name VARCHAR(50),
     last_name VARCHAR(50),
-    show_last_name BOOLEAN DEFAULT FALSE,
+    show_last_name BOOLEAN DEFAULT 0,
     age INT,
     location VARCHAR(100),
-    gender VARCHAR(20),
-    orientation VARCHAR(20),
-    interests TEXT,
+    gender VARCHAR(10),
     bio TEXT,
-    relationship_goals ENUM('casual', 'serious', 'friendship'),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    FOREIGN KEY (account_id) REFERENCES account(id) ON DELETE CASCADE
 );
