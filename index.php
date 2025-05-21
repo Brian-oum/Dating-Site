@@ -4,6 +4,9 @@ session_start();
 // Set default values to avoid undefined variable errors
 $id = $id ?? '';
 $profile_photo = $profile_photo ?? '';
+$username = $username ?? '';
+$email = $email ?? '';
+$password = $password ?? '';
 $first_name = $first_name ?? '';
 $last_name = $last_name ?? '';
 $show_last_name = $show_last_name ?? '';
@@ -442,10 +445,60 @@ $gender_options = [
         grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
       }
     }
+     /* Password strength indicator */
+    .password-strength {
+      margin-top: 0.5rem;
+      height: 5px;
+      background: #e0e0e0;
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .strength-meter {
+      height: 100%;
+      width: 0;
+      background: var(--danger);
+      transition: all 0.3s;
+    }
+
+    .password-requirements {
+      margin-top: 0.5rem;
+      font-size: 0.8rem;
+      color: var(--gray);
+    }
+
+    .requirement {
+      display: flex;
+      align-items: center;
+      margin-bottom: 0.25rem;
+    }
+
+    .requirement i {
+      margin-right: 0.5rem;
+      font-size: 0.7rem;
+    }
+
+    .requirement.valid {
+      color: var(--success);
+    }
+
+    /* Show/hide password toggle */
+    .password-toggle {
+      position: absolute;
+      right: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      color: var(--gray);
+    }
+
+    .password-input-container {
+      position: relative;
+    }
   </style>
 </head>
 <body>
-  <div class="auth-wrapper">
+   <div class="auth-wrapper">
     <div class="auth-container">
       <h2 class="auth-title">AfroLove</h2>
 
@@ -459,11 +512,57 @@ $gender_options = [
       <!-- Registration Form -->
       <div class="auth-form auth-register" id="register-form" style="display: none;">
         <h3>Create Your Profile</h3>
-        <form id="profileForm" method="POST" action="save_profile.php" enctype="multipart/form-data">
+        <form id="profileForm" method="POST" action="./pages/auth.php" enctype="multipart/form-data">
             <input type="hidden" name="id" value="<?= htmlspecialchars($id) ?>">
 
-            <!-- Step 1: Basic Information -->
+           
+
+            <!-- Step 1: Account Information -->
             <div class="form-step active" id="step-1">
+              <div class="form-group">
+                  <label for="username">Username</label>
+                  <input type="text" id="username" name="username" value="<?= htmlspecialchars($username) ?>" placeholder="Choose a username" required>
+              </div>
+
+              <div class="form-group">
+                  <label for="email">Email Address</label>
+                  <input type="email" id="email" name="email" value="<?= htmlspecialchars($email) ?>" placeholder="Enter your email" required>
+              </div>
+
+              <div class="form-group">
+                  <label for="password">Password</label>
+                  <div class="password-input-container">
+                      <input type="password" id="password" name="password" value="<?= htmlspecialchars($password) ?>" placeholder="Create a password" required>
+                      <span class="password-toggle" id="passwordToggle">
+                          <i class="far fa-eye"></i>
+                      </span>
+                  </div>
+                  <div class="password-strength">
+                      <div class="strength-meter" id="strengthMeter"></div>
+                  </div>
+                  <div class="password-requirements">
+                      <div class="requirement" id="lengthReq">
+                          <i class="far fa-circle"></i>
+                          <span>At least 8 characters</span>
+                      </div>
+                      <div class="requirement" id="numberReq">
+                          <i class="far fa-circle"></i>
+                          <span>Contains a number</span>
+                      </div>
+                      <div class="requirement" id="specialReq">
+                          <i class="far fa-circle"></i>
+                          <span>Contains a special character</span>
+                      </div>
+                  </div>
+              </div>
+
+              <div class="form-navigation">
+                <button type="button" class="btn btn-primary next-step" data-next="2">Continue</button>
+              </div>
+            </div>
+
+            <!-- Step 2: Profile Information -->
+            <div class="form-step" id="step-2">
               <div class="form-group profile-photo-container">
                   <?php if (!empty($profile_photo) && file_exists("../$profile_photo")): ?>
                       <img src="../<?= htmlspecialchars($profile_photo) ?>" class="profile-photo-preview" id="photoPreview">
@@ -497,12 +596,13 @@ $gender_options = [
               </div>
 
               <div class="form-navigation">
-                <button type="button" class="btn btn-primary next-step" data-next="2">Continue</button>
+                <button type="button" class="btn btn-outline prev-step" data-prev="1">Back</button>
+                <button type="button" class="btn btn-primary next-step" data-next="3">Continue</button>
               </div>
             </div>
 
-            <!-- Step 2: Personal Details -->
-            <div class="form-step" id="step-2">
+            <!-- Step 3: Personal Details -->
+            <div class="form-step" id="step-3">
               <div class="form-group">
                   <label for="age">Age</label>
                   <input type="number" id="age" name="age" value="<?= htmlspecialchars($age) ?>" placeholder="Enter your age" min="18" max="120" required>
@@ -530,23 +630,16 @@ $gender_options = [
               </div>
 
               <div class="form-navigation">
-                <button type="button" class="btn btn-outline prev-step" data-prev="1">Back</button>
-                <button type="button" class="btn btn-primary next-step" data-next="3">Continue</button>
-              </div>
-
-
-              <div class="form-navigation">
                 <button type="button" class="btn btn-outline prev-step" data-prev="2">Back</button>
-                <button type="submit" class="btn btn-primary">Complete Registration</button>
+                <button type="submit" name = "register" class="btn btn-primary">Complete Registration</button>
               </div>
             </div>
         </form>
         <p>Already have an account? <a href="#" onclick="showLogin()">Sign In</a></p>
       </div>
 
-      <!-- Login Form -->
+      <!-- Login Form remains the same -->
       <div class="auth-form auth-login" id="login-form">
-        <h3>Welcome Back</h3>
         <form action="./pages/auth.php" method="POST" class="form">
           <div class="form-group">
             <input class="form-input" type="text" name="identifier" placeholder="Email or Username" required />
@@ -563,8 +656,7 @@ $gender_options = [
   </div>
 
   <script>
-    // Toggle between login and register forms
-    function showLogin() {
+      function showLogin() {
         document.getElementById('register-form').style.display = 'none';
         document.getElementById('login-form').style.display = 'block';
     }
@@ -597,6 +689,71 @@ $gender_options = [
         }
     });
 
+    // Password strength checker
+    document.getElementById('password')?.addEventListener('input', function(e) {
+        const password = e.target.value;
+        const strengthMeter = document.getElementById('strengthMeter');
+        const lengthReq = document.getElementById('lengthReq');
+        const numberReq = document.getElementById('numberReq');
+        const specialReq = document.getElementById('specialReq');
+        
+        // Reset all
+        strengthMeter.style.width = '0%';
+        strengthMeter.style.backgroundColor = 'var(--danger)';
+        [lengthReq, numberReq, specialReq].forEach(el => {
+            el.classList.remove('valid');
+            el.querySelector('i').className = 'far fa-circle';
+        });
+        
+        // Check requirements
+        let strength = 0;
+        
+        // Length requirement
+        if (password.length >= 8) {
+            strength += 33;
+            lengthReq.classList.add('valid');
+            lengthReq.querySelector('i').className = 'fas fa-check-circle';
+        }
+        
+        // Number requirement
+        if (/\d/.test(password)) {
+            strength += 33;
+            numberReq.classList.add('valid');
+            numberReq.querySelector('i').className = 'fas fa-check-circle';
+        }
+        
+        // Special character requirement
+        if (/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+            strength += 34;
+            specialReq.classList.add('valid');
+            specialReq.querySelector('i').className = 'fas fa-check-circle';
+        }
+        
+        // Update strength meter
+        strengthMeter.style.width = strength + '%';
+        
+        // Change color based on strength
+        if (strength > 66) {
+            strengthMeter.style.backgroundColor = 'var(--success)';
+        } else if (strength > 33) {
+            strengthMeter.style.backgroundColor = 'var(--warning)';
+        }
+    });
+
+    // Toggle password visibility
+    document.getElementById('passwordToggle')?.addEventListener('click', function() {
+        const passwordInput = document.getElementById('password');
+        const icon = this.querySelector('i');
+        
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            icon.className = 'far fa-eye-slash';
+        } else {
+            passwordInput.type = 'password';
+            icon.className = 'far fa-eye';
+        }
+    });
+
     // Multi-step form functionality
     document.querySelectorAll('.next-step').forEach(button => {
         button.addEventListener('click', function() {
@@ -616,13 +773,14 @@ $gender_options = [
                 }
             });
             
-            // Special validation for age
-            const ageInput = document.getElementById('age');
-            if (ageInput && (ageInput.value < 18 || ageInput.value > 120)) {
-                ageInput.style.borderColor = 'var(--danger)';
+            // Special validation for email
+            const emailInput = document.getElementById('email');
+            if (emailInput && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailInput.value)) {
+                emailInput.style.borderColor = 'var(--danger)';
                 isValid = false;
-                alert('Please enter a valid age between 18 and 120');
+                alert('Please enter a valid email address');
             }
+     
             
             if (isValid) {
                 currentStep.classList.remove('active');

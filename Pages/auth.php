@@ -1,14 +1,24 @@
 <?php
 session_start();
-include '../config/db.php';
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
 
-// REGISTER
+// Step 1: DB connection
+$db_path = '../config/db.php';
+if (!file_exists($db_path)) {
+    die("Error: DB config file not found at $db_path");
+}
+include $db_path;
+
+// Step 2: Check if register
 if (isset($_POST['register'])) {
+    echo "Step: Registering<br>";
+
+    // Fetch form data
     $username = trim($_POST['username'] ?? '');
     $email = trim($_POST['email'] ?? '');
     $password = $_POST['password'] ?? '';
 
-    // Additional profile fields
     $first_name = trim($_POST['first_name'] ?? '');
     $last_name = trim($_POST['last_name'] ?? '');
     $show_last_name = isset($_POST['show_last_name']) ? 1 : 0;
@@ -17,73 +27,64 @@ if (isset($_POST['register'])) {
     $gender = trim($_POST['gender'] ?? '');
     $bio = trim($_POST['bio'] ?? '');
 
-    // Handle profile photo upload
     $profile_photo = '';
     if (!empty($_FILES['profile_photo']['name'])) {
         $uploadDir = '../uploads/';
         if (!file_exists($uploadDir)) {
             mkdir($uploadDir, 0755, true);
         }
+
         $profile_photo_name = basename($_FILES['profile_photo']['name']);
-        $profile_photo = 'uploads/' . $profile_photo_name;
-        move_uploaded_file($_FILES['profile_photo']['tmp_name'], $uploadDir . $profile_photo_name);
+        $target_path = $uploadDir . $profile_photo_name;
+        if (move_uploaded_file($_FILES['profile_photo']['tmp_name'], $target_path)) {
+            $profile_photo = 'uploads/' . $profile_photo_name;
+        } else {
+            die("Error uploading profile photo.");
+        }
     }
 
-    // Basic validation
+    // Validate
     if (empty($username) || empty($email) || empty($password)) {
-        $_SESSION['message'] = "Username, email, and password are required!";
-        header("Location: ../index.php");
-        exit;
+        die("Missing required fields.");
     }
 
-    // Check if user already exists
+    // Check if user exists
     $stmt = $pdo->prepare("SELECT id FROM account WHERE email = ? OR username = ?");
     $stmt->execute([$email, $username]);
     if ($stmt->rowCount() > 0) {
-        $_SESSION['message'] = "User already exists!";
-        header("Location: ../index.php");
-        exit;
+        die("User already exists.");
     }
 
-    // Insert into `account`
+    // Create account
     $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
     $stmt = $pdo->prepare("INSERT INTO account (username, email, password) VALUES (?, ?, ?)");
-    if ($stmt->execute([$username, $email, $hashedPassword])) {
-        $account_id = $pdo->lastInsertId();
-
-        // Insert into `users` table
-        $stmt = $pdo->prepare("INSERT INTO users (account_id, profile_photo, first_name, last_name, show_last_name, age, location, gender, bio)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-        $stmt->execute([
-            $account_id,
-            $profile_photo,
-            $first_name,
-            $last_name,
-            $show_last_name,
-            $age,
-            $location,
-            $gender,
-            $bio
-        ]);
-
-        $_SESSION['message'] = "Registration successful! Please login.";
-    } else {
-        $_SESSION['message'] = "Registration failed!";
+    if (!$stmt->execute([$username, $email, $hashedPassword])) {
+        die("Account creation failed.");
     }
 
+    $account_id = $pdo->lastInsertId();
+
+    // Insert profile
+    $stmt = $pdo->prepare("INSERT INTO users (account_id, profile_photo, first_name, last_name, show_last_name, age, location, gender, bio)
+                           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    if (!$stmt->execute([$account_id, $profile_photo, $first_name, $last_name, $show_last_name, $age, $location, $gender, $bio])) {
+        die("User profile creation failed.");
+    }
+
+    $_SESSION['message'] = "Registration successful! Please login.";
     header("Location: ../index.php");
     exit;
 }
 
 // LOGIN
 if (isset($_POST['login'])) {
+    echo "Step: Logging in<br>";
+
     $identifier = trim($_POST['identifier'] ?? '');
     $password = $_POST['password'] ?? '';
 
     if (empty($identifier) || empty($password)) {
-        $_SESSION['message'] = "Please enter both identifier and password!";
-        header("Location: ../index.php");
-        exit;
+        die("Please enter both identifier and password.");
     }
 
     $stmt = $pdo->prepare("SELECT * FROM account WHERE email = ? OR username = ?");
@@ -93,13 +94,13 @@ if (isset($_POST['login'])) {
     if ($user && password_verify($password, $user['password'])) {
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['username'] = $user['username'];
-        $_SESSION['message'] = "Welcome, " . htmlspecialchars($user['username']) . "!";
         header("Location: ../pages/dashboard.php");
         exit;
     } else {
-        $_SESSION['message'] = "Invalid credentials!";
-        header("Location: ../index.php");
-        exit;
+        die("Invalid credentials.");
     }
 }
+
+// Fallback
+echo "No action performed.";
 ?>
