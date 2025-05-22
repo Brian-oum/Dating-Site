@@ -1,0 +1,152 @@
+<?php
+require_once '../config/db.php';
+
+class MatchSystem {
+    private PDO $db;
+
+    public function __construct(PDO $db) {
+        $this->db = $db;
+    }
+
+    public function getUserMatches(int $userId): array {
+        try {
+            $stmt = $this->db->prepare("
+                SELECT u.id, u.username, u.profile_photo, u.age, u.location, u.gender, u.bio, m.match_date
+                FROM matches m
+                JOIN users u ON (u.id = m.user1_id OR u.id = m.user2_id) AND u.id != :userId
+                WHERE (m.user1_id = :userId OR m.user2_id = :userId) AND m.is_mutual = TRUE
+                ORDER BY m.match_date DESC
+            ");
+            $stmt->execute([':userId' => $userId]);
+            return $stmt->fetchAll();
+        } catch (PDOException $e) {
+            error_log("getUserMatches error: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    public function getPotentialMatches(int $userId, int $limit = 10): array {
+        try {
+            $prefs = $this->getUserPreferences($userId);
+
+            $query = "
+                SELECT u.id, u.username, u.profile_photo, u.age, u.location, u.gender, u.bio,
+                       (
+                         (CASE WHEN u.age BETWEEN :min_age AND :max_age THEN 1 ELSE 0 END) +
+                         (CASE WHEN u.gender = :gender THEN 1 ELSE 0 END) +
+                         (CASE WHEN u.location LIKE :location THEN 1 ELSE 0 END)
+                       ) AS score
+                FROM users u
+                WHERE u.id != :user_id
+                  AND u.active = 1
+                  AND u.id NOT IN (
+                      SELECT target_user_id FROM user_actions WHERE user_id = :user_id
+                  )
+                ORDER BY score DESC, RAND()
+                LIMIT :limit
+            ";
+
+            $stmt = $this->db->prepare($query);
+            $stmt->bindValue(':min_age', $prefs['min_age'], PDO::PARAM_INT);
+            $stmt->bindValue(':max_age', $prefs['max_age'], PDO::PARAM_INT);
+            $stmt->bindValue(':gender', $prefs['gender_preference'] ?? '', PDO::PARAM_STR);
+            $stmt->bindValue(':location', "%" . ($prefs['location_preference'] ?? '') . "%", PDO::PARAM_STR);
+            $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
+            $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+            $stmt->execute();
+
+            return $stmt->fetchAll();
+        } catch (PDOException $e) {
+            error_log("getPotentialMatches error: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    public function recordAction(int $userId, int $targetUserId, string $action): bool {
+        try {
+            $stmt = $this->db->prepare("
+                INSERT INTO user_actions (user_id, target_user_id, action)
+                VALUES (:userId, :targetId, :action)
+                ON DUPLICATE KEY UPDATE action = :action, action_time = NOW()
+            ");
+            $stmt->execute([
+                ':userId' => $userId,
+                ':targetId' => $targetUserId,
+                ':action' => $action
+            ]);
+
+            if (in_array($action, ['like', 'superlike'])) {
+                return $this->checkMutualLike($userId, $targetUserId);
+            }
+
+            return true;
+        } catch (PDOException $e) {
+            error_log("recordAction error: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    private function checkMutualLike(int $userId, int $targetId): bool {
+        try {
+            $stmt = $this->db->prepare("
+                SELECT 1 FROM user_actions
+                WHERE user_id = :targetId AND target_user_id = :userId
+                  AND action IN ('like', 'superlike')
+            ");
+            $stmt->execute([':userId' => $userId, ':targetId' => $targetId]);
+
+            if ($stmt->rowCount()) {
+                $this->createMatch($userId, $targetId);
+                return true;
+            }
+            return false;
+        } catch (PDOException $e) {
+            error_log("checkMutualLike error: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    private function createMatch(int $user1Id, int $user2Id): bool {
+        try {
+            if ($user1Id > $user2Id) {
+                [$user1Id, $user2Id] = [$user2Id, $user1Id];
+            }
+
+            $stmt = $this->db->prepare("
+                INSERT INTO matches (user1_id, user2_id, user1_liked, user2_liked, is_mutual)
+                VALUES (:u1, :u2, TRUE, TRUE, TRUE)
+                ON DUPLICATE KEY UPDATE is_mutual = TRUE
+            ");
+            $stmt->execute([':u1' => $user1Id, ':u2' => $user2Id]);
+
+            return true;
+        } catch (PDOException $e) {
+            error_log("createMatch error: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    private function getUserPreferences(int $userId): array {
+        try {
+            $stmt = $this->db->prepare("
+                SELECT min_age, max_age, gender_preference, location_preference
+                FROM preferences WHERE user_id = :userId
+            ");
+            $stmt->execute([':userId' => $userId]);
+            return $stmt->fetch() ?: [
+                'min_age' => 18,
+                'max_age' => 99,
+                'gender_preference' => null,
+                'location_preference' => null
+            ];
+        } catch (PDOException $e) {
+            error_log("getUserPreferences error: " . $e->getMessage());
+            return [
+                'min_age' => 18,
+                'max_age' => 99,
+                'gender_preference' => null,
+                'location_preference' => null
+            ];
+        }
+    }
+}
