@@ -502,7 +502,7 @@ $user = $stmt->fetch(PDO::FETCH_ASSOC);
     <ul class="sidebar-menu">
       <li><a href="dashboard.php" class="active"><i class="fas fa-home"></i> <span>Dashboard</span></a></li>
       <li><a href="profile.php"><i class="fas fa-user-edit"></i> <span>Edit Profile</span></a></li>
-      <li><a href="match.php"><i class="fas fa-heart"></i> <span>Matches</span></a></li>
+      <li><a href="matches.php"><i class="fas fa-heart"></i> <span>Matches</span></a></li>
       <li><a href="messages.php"><i class="fas fa-envelope"></i> <span>Messages</span> <span class="badge badge-primary">3</span></a></li>
       <li><a href="settings.php"><i class="fas fa-cog"></i> <span>Settings</span></a></li>
     </ul>
