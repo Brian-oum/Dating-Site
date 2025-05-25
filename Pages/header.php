@@ -16,7 +16,6 @@ $user = isset($_SESSION['user']) ? $_SESSION['user'] : null;
     <title>LoveConnect</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Navbar Styles */
         .navbar {
             display: flex;
             justify-content: space-between;
@@ -37,7 +36,6 @@ $user = isset($_SESSION['user']) ? $_SESSION['user'] : null;
             color: #ff4757;
         }
 
-        /* User Menu Styles */
         .user-menu {
             position: relative;
             display: flex;
@@ -104,7 +102,6 @@ $user = isset($_SESSION['user']) ? $_SESSION['user'] : null;
             color: #ff4757;
         }
 
-        /* Auth Buttons */
         .auth-buttons {
             display: flex;
             gap: 12px;
@@ -141,7 +138,6 @@ $user = isset($_SESSION['user']) ? $_SESSION['user'] : null;
             border-color: #e84141;
         }
 
-        /* Responsive Styles */
         @media (max-width: 768px) {
             .navbar {
                 padding: 12px 20px;
@@ -172,16 +168,17 @@ $user = isset($_SESSION['user']) ? $_SESSION['user'] : null;
         <div class="navbar-brand">LoveConnect</div>
 
         <?php ($user) ?>
-        <div class="user-menu">
-            <img src="<?= htmlspecialchars($user['profile_photo'] ?? 'https://randomuser.me/api/portraits/men/1.jpg') ?>" class="user-avatar" alt="Profile Photo">
-            <span class="username"><?= htmlspecialchars($user['username']) ?></span>
-            <i class="fas fa-chevron-down dropdown-arrow"></i>
-            <div class="dropdown-menu">
-                <a href="profile.php">My Profile</a>
-                <a href="settings.php">Settings</a>
-                <a href="logout.php">Logout</a>
+            <div class="user-menu">
+                <img src="<?= htmlspecialchars($user['profile_photo'] ?? 'images/default-profile.jpg') ?>" class="user-avatar" alt="Profile Photo">
+                <span class="username"><?= htmlspecialchars($user['username']) ?></span>
+                <i class="fas fa-chevron-down dropdown-arrow"></i>
+                <div class="dropdown-menu">
+                    <a href="profile.php">My Profile</a>
+                    <a href="settings.php">Settings</a>
+                    <a href="logout.php">Logout</a>
+                </div>
             </div>
-        </div>
+      
     </div>
 </body>
 </html>

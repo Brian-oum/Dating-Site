@@ -34,39 +34,7 @@ try {
 <html>
 <head>
     <title>Your Matches</title>
-    <link rel="stylesheet" href="../assets/css/style.css"> <!-- Optional external styles -->
-    <style>
-        .match-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            margin-top: 20px;
-        }
-        .match-card {
-            border: 1px solid #ddd;
-            padding: 15px;
-            border-radius: 10px;
-            width: 200px;
-            text-align: center;
-            background-color: #f5f5f5;
-            box-shadow: 0 0 5px rgba(0,0,0,0.1);
-        }
-        .match-card img {
-            border-radius: 50%;
-            height: 100px;
-            width: 100px;
-            object-fit: cover;
-        }
-        .no-matches {
-            color: #777;
-            background: #ffefef;
-            padding: 15px;
-            border-radius: 8px;
-            text-align: center;
-            margin-top: 20px;
-            font-style: italic;
-        }
-    </style>
+    <link rel="stylesheet" href="../css/style.css"> <!-- Optional external styles -->
 </head>
 <body>
     <h1>Your Matches</h1>
