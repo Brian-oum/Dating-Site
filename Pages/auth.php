@@ -78,26 +78,41 @@ if (isset($_POST['register'])) {
 
 // LOGIN
 if (isset($_POST['login'])) {
-    echo "Step: Logging in<br>";
+    require_once '../config/db.php'; // Ensure DB connection is included
+    session_start();
 
     $identifier = trim($_POST['identifier'] ?? '');
     $password = $_POST['password'] ?? '';
 
     if (empty($identifier) || empty($password)) {
-        die("Please enter both identifier and password.");
+        $_SESSION['message'] = "Please enter both email/username and password.";
+        header("Location: ../index.php");
+        exit;
     }
 
-    $stmt = $pdo->prepare("SELECT * FROM account WHERE email = ? OR username = ?");
-    $stmt->execute([$identifier, $identifier]);
-    $user = $stmt->fetch();
+    try {
+        $stmt = $pdo->prepare("SELECT * FROM account WHERE email = ? OR username = ?");
+        $stmt->execute([$identifier, $identifier]);
+        $user = $stmt->fetch();
 
-    if ($user && password_verify($password, $user['password'])) {
-        $_SESSION['user_id'] = $user['id'];
-        $_SESSION['username'] = $user['username'];
-        header("Location: ../pages/dashboard.php");
+        if ($user && password_verify($password, $user['password'])) {
+            $_SESSION['user_id'] = $user['id'];
+            $_SESSION['username'] = $user['username'];
+
+            // Optional: redirect to previously intended page
+            header("Location: ../pages/dashboard.php");
+            exit;
+        } else {
+            $_SESSION['message'] = "Invalid username/email or password.";
+            header("Location: ../index.php");
+            exit;
+        }
+
+    } catch (PDOException $e) {
+        error_log("Login error: " . $e->getMessage());
+        $_SESSION['message'] = "An error occurred. Please try again later.";
+        header("Location: ../index.php");
         exit;
-    } else {
-        die("Invalid credentials.");
     }
 }
 
