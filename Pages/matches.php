@@ -321,7 +321,7 @@ $matches = $matchSystem->getUserMatches($userId);
                 <a href="./discover.php"><i class="fas fa-search"></i> Discover</a>
                 <a href="./matches.php"><i class="fas fa-heart"></i> Matches</a>
                 <a href="./messages.php"><i class="fas fa-comments"></i> Messages</a>
-                <a href="./profile.php"><i class="fas fa-user"></i> Profile</a>
+                <a href="./view_profile.php"><i class="fas fa-user"></i> Profile</a>
                 <div class="dropdown-divider"></div>
                 <a href="./settings.php"><i class="fas fa-cog"></i> Settings</a>
                 <a href="./logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a>

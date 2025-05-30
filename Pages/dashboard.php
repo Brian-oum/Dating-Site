@@ -36,7 +36,7 @@ $user = $stmt->fetch(PDO::FETCH_ASSOC);
       <span><?= htmlspecialchars($user['username']) ?></span>
       <i class="fas fa-chevron-down"></i>
       <div class="dropdown-menu">
-        <a href="profile.php"><i class="fas fa-user"></i> My Profile</a>
+        <a href="view_profile.php"><i class="fas fa-user"></i> My Profile</a>
         <a href="settings.php"><i class="fas fa-cog"></i> Settings</a>
         <a href="logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a>
       </div>
