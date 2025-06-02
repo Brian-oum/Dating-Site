@@ -1,8 +1,8 @@
 /*Login and Registration Styles*/
  
  :root {
-      --primary: #ff6b6b;
-      --primary-dark: #ff5252;
+      --primary: hsl(335, 54%, 38%);
+      --primary-dark: hsl(340, 68%, 37%);
       --secondary: #4ecdc4;
       --dark: #2b2d42;
       --light: #f8f9fa;
@@ -464,7 +464,7 @@
 
 /*Dashboard Styles*/
 :root {
-      --primary: #FF5A5F;
+      --primary: #832252;
       --secondary: #00A699;
       --dark: #2B2D42;
       --light: #F7F9FC;
@@ -639,7 +639,7 @@
     }
 
     .welcome-banner {
-      background: linear-gradient(135deg, var(--primary), #FF7E82);
+      background: linear-gradient(135deg, var(--primary), hsl(320, 74%, 29%));
       color: white;
       padding: 2rem;
       border-radius: 12px;
@@ -812,7 +812,7 @@
     }
 
     .btn-primary:hover {
-      background-color: #E04A4F;
+      background-color: hsl(327, 68%, 23%);
     }
 
     .btn-outline {

@@ -1,4 +1,4 @@
-REATE TABLE account (
+CREATE TABLE account (
     id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(255) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
@@ -52,4 +52,12 @@ CREATE TABLE user_actions (
     FOREIGN KEY (user_id) REFERENCES users(id),
     FOREIGN KEY (target_user_id) REFERENCES users(id),
     UNIQUE KEY unique_action (user_id, target_user_id)
+);
+
+CREATE TABLE messages (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    sender_id INT NOT NULL,
+    receiver_id INT NOT NULL,
+    message TEXT NOT NULL,
+    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
 );

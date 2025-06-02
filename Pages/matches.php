@@ -64,7 +64,7 @@ $matches = $matchSystem->getUserMatches($userId);
             height: 40px;
             border-radius: 50%;
             object-fit: cover;
-            border: 2px solid #e83e8c;
+            border: 2px solidrgb(126, 44, 82);
         }
         
         .username {
@@ -214,7 +214,7 @@ $matches = $matchSystem->getUserMatches($userId);
             position: absolute;
             top: 15px;
             right: 15px;
-            background-color: #e83e8c;
+            background-color:rgb(156, 35, 91);
             color: white;
             padding: 5px 10px;
             border-radius: 20px;
@@ -255,7 +255,7 @@ $matches = $matchSystem->getUserMatches($userId);
         
         .interest-tag {
             background-color: #f8e1eb;
-            color: #e83e8c;
+            color:rgb(124, 25, 71);
             padding: 5px 12px;
             border-radius: 20px;
             font-size: 12px;
@@ -284,12 +284,12 @@ $matches = $matchSystem->getUserMatches($userId);
         }
         
         .message-btn {
-            background-color: #e83e8c;
+            background-color:rgb(143, 31, 83);
             color: white;
         }
         
         .message-btn:hover {
-            background-color: #d2337d;
+            background-color:rgb(124, 19, 68);
         }
         
         .view-btn {
