@@ -61,3 +61,19 @@ CREATE TABLE messages (
     message TEXT NOT NULL,
     timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
 );
+
+
+CREATE TABLE user_settings (
+    user_id INT PRIMARY KEY,
+    show_age BOOLEAN DEFAULT TRUE,
+    show_location BOOLEAN DEFAULT TRUE,
+    profile_visibility ENUM('public', 'members', 'matches') DEFAULT 'public',
+    allow_messages_from ENUM('everyone', 'matches', 'none') DEFAULT 'everyone',
+    distance_unit ENUM('miles', 'kilometers') DEFAULT 'miles',
+    theme_preference ENUM('light', 'dark', 'afro') DEFAULT 'light',
+    notification_email BOOLEAN DEFAULT TRUE,
+    notification_push BOOLEAN DEFAULT TRUE,
+    notification_sms BOOLEAN DEFAULT FALSE,
+    language VARCHAR(10) DEFAULT 'en',
+    FOREIGN KEY (user_id) REFERENCES account(id) ON DELETE CASCADE
+);
